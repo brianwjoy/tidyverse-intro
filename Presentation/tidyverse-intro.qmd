@@ -1,6 +1,5 @@
 ---
 title: "R and the Tidyverse"
-subtitle: "for the IR Professional"
 author:  
   name: Brian Joy
 format: 
