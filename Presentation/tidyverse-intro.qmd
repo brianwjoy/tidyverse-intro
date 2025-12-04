@@ -1,0 +1,419 @@
+---
+title: "R and the Tidyverse"
+subtitle: "for the IR Professional"
+author:  
+  name: Brian Joy
+format: 
+  revealjs:
+    theme: sky
+    css: styles.css
+    footer: https://github.com/brianwjoy/tidyverse-intro
+from: markdown+emoji
+---
+
+## :mag: Objectives
+
+-   Why should I bother learning a new tool like R?
+-   How do I get started?
+-   Where can I learn more?
+
+::: notes
+During our brief time together, my goal is to provide helpful and compelling answers to the following three questions. An entire semester-long course could be dedicated to this topic, but today I hope to show some simple examples and spark your curiosity in learning more about R and the ways it can streamline your work.
+:::
+
+# Why bother? :man_shrugging:
+
+## Have you ever been asked...
+
+<br> Can you explain each step of your Excel analysis?
+
+::: notes
+Find yourself clicking through columns trying to explain formulas and how cell A43 relates to AB4...
+:::
+
+## Have you ever been asked...
+
+<br> Can you recreate last year's analysis spreadsheet using current year data?
+
+::: notes
+Recreate your entire analysis workflow from scratch, try to remember all your intermediate calculations, trace how all the complex formulas reference each other
+:::
+
+## Have you ever been asked...
+
+<br> Can you polish these Excel charts to make them appear a little bit more publication-ready?
+
+::: notes
+Spend hours clicking through menus making the same minute adjustment to dozens of charts
+:::
+
+## R can solve these problems!
+
+<br>
+
+-   Separating data from analysis
+-   Enabling greater transparency and reproducibility
+-   Automation, iteration, and fine-grain control
+
+::: notes
+There is of course a learning curve, but the long term payoff is much greater than the initial challenge. Excel is, of course, an important tool and certainly has its uses but there are other free and accessible tools (like R) that 
+:::
+
+# Let's get started! :hammer:
+
+<br>
+
+## What are R and RStudio?
+
+<br>
+
+### :red_car: An analogy:
+
+::: incremental
+-   R is the car's engine
+-   RStudio is the car's dashboard
+:::
+
+::: aside
+[Statistical Inference via Data Science: A ModernDive into R and the Tidyverse (Second Edition)](https://moderndive.com/v2/getting-started.html)
+:::
+
+::: notes
+R is the programming language that runs computations; while RStudio is the IDE that provides an interface and adding convenient features tools. Just like having a speedometer, mirrors, navigation, etc.
+:::
+
+## [:package:What are packages? Which ones do I need?]{.r-fit-text}
+
+::: {.fragment .fade-in-then-out}
+A set of functions that extends or improves on the base functionality of R
+:::
+
+::: {.fragment .fade-in-then-out}
+Today, we are going to focus on the Tidyverse
+:::
+
+::: {.fragment .fade-in}
+"The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures."
+:::
+
+::: aside
+https://tidyverse.org/
+:::
+
+## :compass: RStudio Orientation
+
+## [Install and Load the tidyverse]{.r-fit-text}
+
+<br>
+
+```{r}
+#| echo: true
+#| messages: true
+# If needed, install the tidyverse
+# install.packages("tidyverse")
+
+# Load the tidyverse during each session
+library(tidyverse)
+```
+<br>
+<br>
+
+::: {.callout-tip}
+
+-  Toggle comments on or off using {{< kbd "Ctrl+Shift+C" >}}
+-  Use {{< kbd "Ctrl+Enter" >}} to run selected lines of code 
+
+
+:::
+## Read in .CSV Data
+
+<br>
+
+```{r}
+#| echo: true
+#| output: true
+
+
+# Load data from relative path
+df <- read_csv("../Data/fictitious_student_enrollment_panel.csv")
+
+```
+<br>
+<br>
+
+::: {.callout-tip}
+
+-  If using Windows, you can {{< kbd "Shift+Right Click" >}} on the file
+    - Select "Copy as Path"
+    - Paste ({{< kbd "Ctrl+v" >}}) into RStudio
+-  Make sure your file path uses {{< kbd "/" >}} and not {{< kbd "\\" >}}
+-  Insert the assignment operator using {{< kbd "Alt+-" >}}
+
+:::
+
+::: notes
+Explain the left hand assignment operator, read_csv as one of the tidyverse functions, and relative path
+:::
+
+## Preview the Data
+
+<br>
+
+```{r}
+#| echo: true
+#| output: true
+
+
+# Preview first 6 six rows of data
+df %>% head()
+```
+::: {.callout-tip}
+
+-  Insert the pipe operator ({{< kbd "%>%" >}}) using {{< kbd "Ctrl+Shift+M" >}}
+
+:::
+::: notes
+Explain the concept of tibble
+:::
+
+## Explore the data
+<br>
+
+### Which Enrollment Terms are included?
+::: {.panel-tabset}
+### W/O Pipe
+```{r}
+#| echo: true
+#| output: true
+
+distinct(df, EnrollmentTerm)
+```
+
+### W/ Pipe
+```{r}
+#| echo: true
+#| output: true
+
+df %>% 
+  distinct(EnrollmentTerm)
+
+```
+
+:::
+
+::: notes
+explain the pipe operator: rather than having to read inside out, the pipe allows you to read left  to right and top to bottom
+:::
+
+## Explore the data
+<br>
+
+### [How many students are enrolled in each term?]{.r-fit-text}
+
+::: {.panel-tabset}
+### filter()
+```{r}
+#| echo: true
+#| output: true
+
+df %>% 
+  filter(EnrollmentTerm == "Fall 2023") %>% 
+  summarise(student_cnt = n_distinct(StudentID))
+```
+
+### group_by()
+```{r}
+#| echo: true
+#| output: true
+
+df %>% 
+  group_by(EnrollmentTerm) %>% 
+  summarise(student_cnt = n_distinct(StudentID))
+
+```
+
+:::
+
+::: notes
+reinforce the pipe operator, filter, summarize (collapse to single row), introduce n_distinct
+:::
+
+
+
+## Create a new variable
+<br>
+
+### Binary Fall Indicator
+
+```{r}
+#| echo: true
+#| output: true
+
+df <- df %>% 
+  mutate(isFall = if_else(TermSeason == "Fall", "Y", "N"))
+
+# Check results
+df %>% 
+  count(isFall)
+```
+
+## :key: Concept Review
+<br>
+
+::: {.incremental}
+-   Leverage the tidyverse using `library(tidyverse)`
+-   Load your data `read_csv("C:/Users/Me/my_data.csv")`
+-   Preview your data `head(df)`
+-   Chain commands using the pipe ` %>% `
+-   Reduce your data to certain rows `filter()`
+-   Explore data using `group_by() %>% summarise()`
+-   Create new variables using `mutate()`
+:::
+
+# Data Visualization
+
+![](https://ggplot2.tidyverse.org/logo.png){.r-stretch .center fig-align="center"}
+
+
+## Visualize GPA and Retention (V1)
+
+::: {.panel-tabset}
+
+### Code
+```{.r}
+df %>% 
+  filter(isFall == "Y") %>% 
+  ggplot(aes(x = EnrollmentTerm, y = GPA)) +
+  geom_boxplot()
+```
+
+### Results
+```{r}
+#| echo: false
+#| output: true
+
+df %>% 
+  filter(isFall == "Y") %>% 
+  ggplot(aes(x = EnrollmentTerm, y = GPA)) +
+  geom_boxplot()
+```
+:::
+
+## Visualize GPA and Retention (V2)
+
+::: {.panel-tabset}
+
+### Code
+```{.r}
+df %>% 
+  filter(isFall == "Y") %>%
+  ggplot(aes(x = EnrollmentTerm, y = GPA, fill = RetainedNextFall)) +
+  geom_boxplot()
+```
+
+### Results
+```{r}
+#| echo: false
+#| output: true
+
+df %>% 
+  filter(isFall == "Y") %>% 
+  ggplot(aes(x = EnrollmentTerm, y = GPA, fill = RetainedNextFall)) +
+  geom_boxplot()
+```
+:::
+
+## Visualize GPA and Retention (V3)
+
+::: {.panel-tabset}
+
+### Code
+```{.r}
+df %>% 
+  filter(isFall == "Y") %>% 
+  ggplot(aes(x = EnrollmentTerm, y = GPA, fill = RetainedNextFall)) +
+  geom_boxplot() +
+  scale_fill_manual( values = c("gray50", "#3E31E4")) +
+  lims(y = c(0,4)) +
+  labs(
+    title = "Average GPA by Retention Status",
+    caption = "Source: Fictitious Data"
+    )+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+### Results
+```{r}
+#| echo: false
+#| output: true
+
+df %>% 
+  filter(isFall == "Y") %>% 
+  ggplot(aes(x = EnrollmentTerm, y = GPA, fill = RetainedNextFall)) +
+   geom_boxplot() +
+  scale_fill_manual( values = c("gray50", "#3E31E4")) +
+  lims(y = c(0,4)) +
+  labs(
+    title = "Average GPA by Retention Status",
+    caption = "Source: Fictitious Data"
+    )+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+:::
+
+
+## Visualize GPA and Retention (V4)
+
+::: {.panel-tabset}
+
+### Code
+```{.r}
+df %>% 
+  filter(isFall == "Y") %>% 
+  ggplot(aes(x = EnrollmentTerm, y = GPA, fill = RetainedNextFall)) +
+  geom_boxplot() +
+  scale_fill_manual( values = c("gray50", "#3E31E4")) +
+  lims(y = c(0,4)) +
+  facet_wrap(vars(AcademicCollege)) +
+  labs(
+    title = "Average GPA by Retention Status",
+    caption = "Source: Fictitious Data"
+    )+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+### Results
+```{r}
+#| echo: false
+#| output: true
+
+df %>% 
+  filter(isFall == "Y") %>% 
+  ggplot(aes(x = EnrollmentTerm, y = GPA, fill = RetainedNextFall)) +
+  geom_boxplot() +
+  scale_fill_manual( values = c("gray50", "#3E31E4")) +
+  lims(y = c(0,4)) +
+  facet_wrap(vars(AcademicCollege)) +
+  labs(
+    title = "Average GPA by Retention Status",
+    caption = "Source: Fictitious Data"
+    )+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+:::
+
+# [Where can I learn more?]{.r-fit-text}
+
+## Further Resources
+<br>
+
+-  [R/ThIRsdays](https://www.reddit.com/r/ThIRsdays/)
+-  [RforIR](https://rforir.netlify.app/)
+-  [R4DS](https://r4ds.hadley.nz/)
+-  [Data Science Learning Community (Slack)](https://dslc.io/)
+-  [R Graph Gallery](https://r-graph-gallery.com/)
+-  [Tidyverse Cheatsheets](https://rstudio.github.io/cheatsheets/)
